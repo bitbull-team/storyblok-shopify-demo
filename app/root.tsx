@@ -20,6 +20,7 @@ import {
 } from '@remix-run/react';
 import {ShopifySalesChannel, Seo, useNonce} from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
+import {apiPlugin, storyblokInit} from '@storyblok/react';
 
 import {Layout} from '~/components';
 import {seoPayload} from '~/lib/seo.server';
@@ -70,6 +71,17 @@ export const useRootLoaderData = () => {
   const [root] = useMatches();
   return root?.data as SerializeFrom<typeof loader>;
 };
+
+const components = {};
+
+storyblokInit({
+  accessToken: 'RPjIGiRIGyBieNEZC0DrQwtt',
+  use: [apiPlugin],
+  components,
+  apiOptions: {
+    region: '',
+  },
+});
 
 export async function loader({request, context}: LoaderFunctionArgs) {
   const {storefront, cart} = context;
