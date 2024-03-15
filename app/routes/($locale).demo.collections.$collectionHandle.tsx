@@ -14,6 +14,11 @@ import {
   getPaginationVariables,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
+import {
+  getStoryblokApi,
+  StoryblokComponent,
+  useStoryblokState,
+} from '@storyblok/react';
 
 import {
   PageHeader,
@@ -35,6 +40,15 @@ import {parseAsCurrency} from '~/lib/utils';
 export const headers = routeHeaders;
 
 export async function loader({params, request, context}: LoaderFunctionArgs) {
+  const slug = `demo/collections/${params.collectionHandle}`;
+
+  const sbParams: any = {
+    version: 'draft', // or 'published'
+  };
+
+  const storyblokApi = getStoryblokApi();
+  const {data} = await storyblokApi.get(`cdn/stories/${slug}`, sbParams);
+
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
@@ -138,6 +152,7 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
       collectionHandle,
       resourceId: collection.id,
     },
+    story: data.story,
     seo,
   });
 }
@@ -148,6 +163,12 @@ export default function Collection() {
 
   const {ref, inView} = useInView();
 
+  const loaderData: any = useLoaderData();
+  const story: any = useStoryblokState(loaderData.story);
+  // eslint-disable-next-line no-debugger
+  debugger;
+
+  // @ts-ignore
   return (
     <>
       <PageHeader heading={collection.title}>
@@ -161,6 +182,7 @@ export default function Collection() {
           </div>
         )}
       </PageHeader>
+      <StoryblokComponent blok={story.content} />
       <Section>
         <SortFilter
           filters={collection.products.filters as Filter[]}

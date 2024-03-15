@@ -4,7 +4,8 @@
   "sideEffects": false,
   "version": "2.1.6",
   "scripts": {
-    "dev": "shopify hydrogen dev --codegen",
+    "dev": "shopify hydrogen dev --codegen --port 3000",
+    "dev-proxy": "local-ssl-proxy --source 3010 --target 3000 --cert localhost.pem --key localhost-key.pem",
     "build": "shopify hydrogen build",
     "preview": "npm run build && shopify hydrogen preview",
     "e2e": "npx playwright test",
