@@ -36,6 +36,7 @@ import type {SortParam} from '~/components/SortFilter';
 import {FILTER_URL_PREFIX} from '~/components/SortFilter';
 import {getImageLoadingPriority} from '~/lib/const';
 import {parseAsCurrency} from '~/lib/utils';
+import HeroMedia from '~/components/HeroMedia';
 
 export const headers = routeHeaders;
 
@@ -165,12 +166,10 @@ export default function Collection() {
 
   const loaderData: any = useLoaderData();
   const story: any = useStoryblokState(loaderData.story);
-  // eslint-disable-next-line no-debugger
-  debugger;
 
   // @ts-ignore
   return (
-    <>
+    <div>
       <PageHeader heading={collection.title}>
         {collection?.description && (
           <div className="flex items-baseline justify-between w-full">
@@ -182,8 +181,8 @@ export default function Collection() {
           </div>
         )}
       </PageHeader>
-      <StoryblokComponent blok={story.content} />
       <Section>
+        <HeroMedia blok={JSON.stringify(story.content)} />
         <SortFilter
           filters={collection.products.filters as Filter[]}
           appliedFilters={appliedFilters}
@@ -227,7 +226,7 @@ export default function Collection() {
           </Pagination>
         </SortFilter>
       </Section>
-    </>
+    </div>
   );
 }
 
