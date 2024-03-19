@@ -191,14 +191,6 @@ export type MenuFragment = Pick<StorefrontAPI.Menu, 'id'> & {
   >;
 };
 
-export type GetShopPrimaryDomainQueryVariables = StorefrontAPI.Exact<{
-  [key: string]: never;
-}>;
-
-export type GetShopPrimaryDomainQuery = {
-  shop: {primaryDomain: Pick<StorefrontAPI.Domain, 'url'>};
-};
-
 export type CollectionContentFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'handle' | 'title' | 'descriptionHtml'
@@ -451,6 +443,14 @@ export type HomepageFeaturedCollectionsQuery = {
       }
     >;
   };
+};
+
+export type GetShopPrimaryDomainQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type GetShopPrimaryDomainQuery = {
+  shop: {primaryDomain: Pick<StorefrontAPI.Domain, 'url'>};
 };
 
 export type ApiAllProductsQueryVariables = StorefrontAPI.Exact<{
@@ -1187,10 +1187,6 @@ interface GeneratedQueryTypes {
     return: LayoutQuery;
     variables: LayoutQueryVariables;
   };
-  '#graphql\n      query getShopPrimaryDomain { shop { primaryDomain { url } } }\n    ': {
-    return: GetShopPrimaryDomainQuery;
-    variables: GetShopPrimaryDomainQueryVariables;
-  };
   '#graphql\n  query seoCollectionContent($handle: String, $country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    hero: collection(handle: $handle) {\n      ...CollectionContent\n    }\n    shop {\n      name\n      description\n    }\n  }\n  #graphql\n  fragment CollectionContent on Collection {\n    id\n    handle\n    title\n    descriptionHtml\n    heading: metafield(namespace: "hero", key: "title") {\n      value\n    }\n    byline: metafield(namespace: "hero", key: "byline") {\n      value\n    }\n    cta: metafield(namespace: "hero", key: "cta") {\n      value\n    }\n    spread: metafield(namespace: "hero", key: "spread") {\n      reference {\n        ...Media\n      }\n    }\n    spreadSecondary: metafield(namespace: "hero", key: "spread_secondary") {\n      reference {\n        ...Media\n      }\n    }\n  }\n  #graphql\n  fragment Media on Media {\n    __typename\n    mediaContentType\n    alt\n    previewImage {\n      url\n    }\n    ... on MediaImage {\n      id\n      image {\n        id\n        url\n        width\n        height\n      }\n    }\n    ... on Video {\n      id\n      sources {\n        mimeType\n        url\n      }\n    }\n    ... on Model3d {\n      id\n      sources {\n        mimeType\n        url\n      }\n    }\n    ... on ExternalVideo {\n      id\n      embedUrl\n      host\n    }\n  }\n\n\n': {
     return: SeoCollectionContentQuery;
     variables: SeoCollectionContentQueryVariables;
@@ -1206,6 +1202,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query homepageFeaturedCollections($country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    collections(\n      first: 4,\n      sortKey: UPDATED_AT\n    ) {\n      nodes {\n        id\n        title\n        handle\n        image {\n          altText\n          width\n          height\n          url\n        }\n      }\n    }\n  }\n': {
     return: HomepageFeaturedCollectionsQuery;
     variables: HomepageFeaturedCollectionsQueryVariables;
+  };
+  '#graphql\n      query getShopPrimaryDomain { shop { primaryDomain { url } } }\n    ': {
+    return: GetShopPrimaryDomainQuery;
+    variables: GetShopPrimaryDomainQueryVariables;
   };
   '#graphql\n  query ApiAllProducts(\n    $query: String\n    $count: Int\n    $reverse: Boolean\n    $country: CountryCode\n    $language: LanguageCode\n    $sortKey: ProductSortKeys\n  ) @inContext(country: $country, language: $language) {\n    products(first: $count, sortKey: $sortKey, reverse: $reverse, query: $query) {\n      nodes {\n        ...ProductCard\n      }\n    }\n  }\n  #graphql\n  fragment ProductCard on Product {\n    id\n    title\n    publishedAt\n    handle\n    vendor\n    variants(first: 1) {\n      nodes {\n        id\n        availableForSale\n        image {\n          url\n          altText\n          width\n          height\n        }\n        price {\n          amount\n          currencyCode\n        }\n        compareAtPrice {\n          amount\n          currencyCode\n        }\n        selectedOptions {\n          name\n          value\n        }\n        product {\n          handle\n          title\n        }\n      }\n    }\n  }\n\n': {
     return: ApiAllProductsQuery;
