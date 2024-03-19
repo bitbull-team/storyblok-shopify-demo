@@ -24,6 +24,7 @@ import {apiPlugin, storyblokInit} from '@storyblok/react';
 
 import {Layout} from '~/components';
 import {seoPayload} from '~/lib/seo.server';
+import Page from '~/components/Page';
 
 import favicon from '../public/favicon.svg';
 
@@ -75,6 +76,7 @@ export const useRootLoaderData = () => {
 
 const components = {
   HeroMedia,
+  page: Page,
 };
 
 storyblokInit({
