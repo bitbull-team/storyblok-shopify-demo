@@ -1,41 +1,46 @@
-import type {EntryContext} from '@shopify/remix-oxygen';
-import {RemixServer} from '@remix-run/react';
+import { RemixServer } from '@remix-run/react';
+import { createContentSecurityPolicy } from '@shopify/hydrogen';
+import type { EntryContext } from '@shopify/remix-oxygen';
 import isbot from 'isbot';
-import {renderToReadableStream} from 'react-dom/server';
-import {createContentSecurityPolicy} from '@shopify/hydrogen';
+import { renderToReadableStream } from 'react-dom/server';
 
 export default async function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext,
+	request: Request,
+	responseStatusCode: number,
+	responseHeaders: Headers,
+	remixContext: EntryContext,
 ) {
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-    frameAncestors: ['https://app.storyblok.com'],
-  });
-  const body = await renderToReadableStream(
-    <NonceProvider>
-      <RemixServer context={remixContext} url={request.url} />
-    </NonceProvider>,
-    {
-      nonce,
-      signal: request.signal,
-      onError(error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-        responseStatusCode = 500;
-      },
-    },
-  );
+	const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+		frameAncestors: [ 'https://app.storyblok.com/' ],
+		imgSrc: [ '*', 'data:' ],
+		scriptSrc: [ '*' ],
+		connectSrc: [ '*' ],
+	});
 
-  if (isbot(request.headers.get('user-agent'))) {
-    await body.allReady;
-  }
+	const body = await renderToReadableStream(
+		<NonceProvider>
+			<RemixServer context={remixContext} url={request.url} />
+		</NonceProvider>,
+		{
+			nonce,
+			signal: request.signal,
+			onError(error) {
+				// eslint-disable-next-line no-console
+				console.error(error);
+				responseStatusCode = 500;
+			},
+		},
+	);
 
-  responseHeaders.set('Content-Type', 'text/html');
-  responseHeaders.set('Content-Security-Policy', header);
-  return new Response(body, {
-    headers: responseHeaders,
-    status: responseStatusCode,
-  });
+	if (isbot(request.headers.get('user-agent'))) {
+		await body.allReady;
+	}
+
+	responseHeaders.set('Content-Type', 'text/html');
+	responseHeaders.set('Content-Security-Policy', header);
+
+	return new Response(body, {
+		headers: responseHeaders,
+		status: responseStatusCode,
+	});
 }

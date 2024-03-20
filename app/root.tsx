@@ -24,7 +24,7 @@ import {apiPlugin, storyblokInit} from '@storyblok/react';
 
 import {Layout} from '~/components';
 import {seoPayload} from '~/lib/seo.server';
-import Page from '~/components/Page';
+import Page from '~/components/storyblok/Page';
 
 import favicon from '../public/favicon.svg';
 
@@ -33,7 +33,7 @@ import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 import {useAnalytics} from './hooks/useAnalytics';
-import HeroMedia from './components/HeroMedia';
+import HeroMedia from './components/storyblok/HeroMedia';
 
 // This is important to avoid re-fetching root queries on sub-navigations
 export const shouldRevalidate: ShouldRevalidateFunction = ({
@@ -76,7 +76,7 @@ export const useRootLoaderData = () => {
 
 const components = {
   HeroMedia,
-  page: Page,
+  Page,
 };
 
 storyblokInit({
