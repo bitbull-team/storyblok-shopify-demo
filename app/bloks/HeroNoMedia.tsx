@@ -9,8 +9,18 @@ const HeroNoMedia = ({
   const renderedRichText = renderRichText(blok.rich_text);
 
   return (
-    <div className="h-150 bg-black p-12">
-      <div className="text-3xl text-white font-bold" {...props} dangerouslySetInnerHTML={{__html: renderedRichText}}></div>
+    <div style={{
+      display: 'flex',
+      background: '#000',
+      height: '150px',
+      padding: '30px',
+        color: 'white',
+    }}>
+      <div style={{
+          fontSize: '20px',
+          fontWeight: 'normal',
+          textTransform: 'uppercase'
+      }} {...props} dangerouslySetInnerHTML={{__html: renderedRichText}}></div>
     </div>
 
   )
