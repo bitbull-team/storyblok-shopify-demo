@@ -290,6 +290,16 @@ function DesktopHeader({
               {item.title}
             </Link>
           ))}
+          <Link
+            to="/demo/catalog"
+            className={({isActive}) =>
+              isActive ? 'pb-1 border-b -mb-px' : 'pb-1'
+            }
+          >
+            <Text as="span" size="copy">
+              Demo Catalog
+            </Text>
+          </Link>
         </nav>
       </div>
       {/*<div className="flex items-center gap-1">*/}
