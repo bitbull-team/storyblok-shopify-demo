@@ -1,15 +1,9 @@
 node_modules
-/.DS_Store
+*.pem
 /.cache
 /build
 /dist
 /public/build
 /.mf
 .env
-.vscode
-.shopify
-/test-results/
-/playwright-report/
-/playwright/.cache/
 .idea
-*.pem

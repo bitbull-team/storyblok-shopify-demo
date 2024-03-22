@@ -1,21 +1,14 @@
 // Virtual entry point for the app
 import * as remixBuild from '@remix-run/dev/server-build';
+import {createStorefrontClient, storefrontRedirect} from '@shopify/hydrogen';
 import {
-  cartGetIdDefault,
-  cartSetIdDefault,
-  createCartHandler,
-  createCustomerAccountClient,
-  createStorefrontClient,
-  storefrontRedirect,
-} from '@shopify/hydrogen';
-import {
+  createCookieSessionStorage,
   createRequestHandler,
-  getStorefrontHeaders,
-  type AppLoadContext,
+  getBuyerIp,
+  type Session,
+  type SessionStorage,
 } from '@shopify/remix-oxygen';
-import { getStoryblokApi } from '@storyblok/react';
-import { CART_QUERY_FRAGMENT } from '~/lib/fragments';
-import { AppSession } from '~/lib/session';
+import {getStoryblokApi} from '@storyblok/react';
 
 /**
  * Export a fetch handler in module format.
@@ -34,10 +27,10 @@ export default {
         throw new Error('SESSION_SECRET environment variable is not set');
       }
 
-      const waitUntil = executionContext.waitUntil.bind(executionContext);
+      const waitUntil = (p: Promise<any>) => executionContext.waitUntil(p);
       const [cache, session] = await Promise.all([
         caches.open('hydrogen'),
-        AppSession.init(request, [env.SESSION_SECRET]),
+        HydrogenSession.init(request, [env.SESSION_SECRET]),
       ]);
 
       /**
@@ -46,37 +39,19 @@ export default {
       const {storefront} = createStorefrontClient({
         cache,
         waitUntil,
+        buyerIp: getBuyerIp(request),
         i18n: {language: 'EN', country: 'US'},
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
         privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
-        storeDomain: env.PUBLIC_STORE_DOMAIN,
+        storeDomain: `https://${env.PUBLIC_STORE_DOMAIN}`,
+        storefrontApiVersion: env.PUBLIC_STOREFRONT_API_VERSION || '2023-01',
         storefrontId: env.PUBLIC_STOREFRONT_ID,
-        storefrontHeaders: getStorefrontHeaders(request),
+        requestGroupId: request.headers.get('request-id'),
       });
 
       /**
-       * Create a client for Customer Account API.
+       * Create Storyblok client.
        */
-      const customerAccount = createCustomerAccountClient({
-        waitUntil,
-        request,
-        session,
-        customerAccountId: env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID,
-        customerAccountUrl: env.PUBLIC_CUSTOMER_ACCOUNT_API_URL,
-      });
-
-      /*
-       * Create a cart handler that will be used to
-       * create and update the cart in the session.
-       */
-      const cart = createCartHandler({
-        storefront,
-        getCartId: cartGetIdDefault(request.headers),
-        setCartId: cartSetIdDefault(),
-        cartQueryFragment: CART_QUERY_FRAGMENT,
-      });
-
-      /** Initialize Storyblok */
       const storyblok = getStoryblokApi();
 
       /**
@@ -86,15 +61,7 @@ export default {
       const handleRequest = createRequestHandler({
         build: remixBuild,
         mode: process.env.NODE_ENV,
-        getLoadContext: (): AppLoadContext => ({
-          session,
-          storefront,
-          customerAccount,
-          cart,
-          env,
-          waitUntil,
-          storyblok,
-        }),
+        getLoadContext: () => ({session, storefront, env, storyblok}),
       });
 
       const response = await handleRequest(request);
@@ -116,3 +83,55 @@ export default {
     }
   },
 };
+
+/**
+ * This is a custom session implementation for your Hydrogen shop.
+ * Feel free to customize it to your needs, add helper methods, or
+ * swap out the cookie-based implementation with something else!
+ */
+class HydrogenSession {
+  constructor(
+    private sessionStorage: SessionStorage,
+    private session: Session,
+  ) {}
+
+  static async init(request: Request, secrets: string[]) {
+    const storage = createCookieSessionStorage({
+      cookie: {
+        name: 'session',
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax',
+        secrets,
+      },
+    });
+
+    const session = await storage.getSession(request.headers.get('Cookie'));
+
+    return new this(storage, session);
+  }
+
+  get(key: string) {
+    return this.session.get(key);
+  }
+
+  destroy() {
+    return this.sessionStorage.destroySession(this.session);
+  }
+
+  flash(key: string, value: any) {
+    this.session.flash(key, value);
+  }
+
+  unset(key: string) {
+    this.session.unset(key);
+  }
+
+  set(key: string, value: any) {
+    this.session.set(key, value);
+  }
+
+  commit() {
+    return this.sessionStorage.commitSession(this.session);
+  }
+}

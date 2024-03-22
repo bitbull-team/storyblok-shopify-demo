@@ -1,6 +1,51 @@
-# Hydrogen template: Demo Store
+# Hydrogen + Oxygen + Storyblok CMS
 
-Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **full-featured setup** of components, queries and tooling to get started with Hydrogen. It is deployed at [hydrogen.shop](https://hydrogen.shop)
+Integration Notes
+
+- Added [public/editor.html](https://github.com/juanpprieto/hydrogen-storyblok/blob/main/public/editor.html)
+- Created a storyblok [client](https://github.com/juanpprieto/hydrogen-storyblok/blob/0bc6c8af33b4d3e97fdac96d3c0f24d955aa0acd/server.ts#L55)
+instance on `server.ts`
+- Exposed the `storyblok` client to the server [context](https://github.com/juanpprieto/hydrogen-storyblok/blob/0bc6c8af33b4d3e97fdac96d3c0f24d955aa0acd/server.ts#L64)
+- [Initiated](https://github.com/juanpprieto/hydrogen-storyblok/blob/0bc6c8af33b4d3e97fdac96d3c0f24d955aa0acd/app/root.tsx#L30)
+the storyblok client at `./app/root.tsx`
+- Created some storyblok blok components at `./app/bloks`
+- Pulled and generated types for storyblok components folowing the instructions
+from [package](https://github.com/dohomi/storyblok-generate-ts)
+- Queried storyblok content in the root layout (header and menu) and routes
+[products example](https://github.com/juanpprieto/hydrogen-storyblok/blob/0bc6c8af33b4d3e97fdac96d3c0f24d955aa0acd/app/routes/products/%24handle.tsx#L6)
+- Added a `cert` script to generate ssl certificates required by storblok's admin
+content previewer
+- Added a `proxy` script to serve localhost via https which also required by storyblok's
+admin content previewer
+
+## /.env
+
+Required env variables
+
+```bash
+SESSION_SECRET="foobar"
+PUBLIC_STOREFRONT_API_TOKEN="...."
+PUBLIC_STOREFRONT_API_VERSION="2023-01"
+PUBLIC_STORE_DOMAIN="your-store.myshopify.com"
+PUBLIC_STORYBLOK_CLIENT_ID="1234567"
+PUBLIC_STORYBLOK_TOKEN="...."
+```
+
+Devlopment:
+
+- run `npm run cert` (once) to generate ssl certificates. You might need to also
+run `brew install mkcert` if not already installed
+- run `npm run dev` in one terminal which exposes `http://localhost:3000` and then,
+- run `npm run proxy` in another terminal which exposes the dev enviroment over ssl
+at `https://localhost:3010`
+
+Note: You'll need to configure storyblok Visual Editor url to point to the ssl localhost
+at port 3010 and also provide the Oxygen deployed URL when editing content within
+a live deployment.
+
+---;
+
+Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **minimal setup** of components, queries and tooling to get started with Hydrogen.
 
 [Check out Hydrogen docs](https://shopify.dev/custom-storefronts/hydrogen)
 [Get familiar with Remix](https://remix.run/docs/en/v1)
@@ -15,17 +60,16 @@ Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dov
 - Prettier
 - GraphQL generator
 - TypeScript and JavaScript flavors
-- Tailwind CSS (via PostCSS)
-- Full-featured setup of components and routes
+- Minimal setup of components and routes
 
 ## Getting started
 
 **Requirements:**
 
-- Node.js version 18.0.0 or higher
+- Node.js version 16.14.0 or higher
 
 ```bash
-npm create @shopify/hydrogen@latest -- --template demo-store
+npm create @shopify/hydrogen@latest --template hello-world
 ```
 
 Remember to update `.env` with your shop's domain and Storefront API token!
@@ -41,18 +85,3 @@ npm run build
 ```bash
 npm run dev
 ```
-
-## Setup for using Customer Account API (`/account` section)
-
-### Setup public domain using ngrok
-
-1. Setup a [ngrok](https://ngrok.com/) account and add a permanent domain (ie. `https://<your-ngrok-domain>.app`).
-1. Install the [ngrok CLI](https://ngrok.com/download) to use in terminal
-1. Start ngrok using `ngrok http --domain=<your-ngrok-domain>.app 3000`
-
-### Include public domain in Customer Account API settings
-
-1. Go to your Shopify admin => `Hydrogen` or `Headless` app/channel => Customer Account API => Application setup
-1. Edit `Callback URI(s)` to include `https://<your-ngrok-domain>.app/account/authorize`
-1. Edit `Javascript origin(s)` to include your public domain `https://<your-ngrok-domain>.app` or keep it blank
-1. Edit `Logout URI` to include your public domain `https://<your-ngrok-domain>.app` or keep it blank
