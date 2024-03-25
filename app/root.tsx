@@ -2,7 +2,7 @@ import {
   json,
   type LinksFunction,
   type LoaderArgs,
-  type MetaFunction,
+  type MetaFunction, SerializeFrom,
 } from '@shopify/remix-oxygen';
 import {
   Links,
@@ -10,7 +10,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
+  useLoaderData, useMatches,
 } from '@remix-run/react';
 import type {Shop} from '@shopify/hydrogen/storefront-api-types';
 import styles from './styles/app.css';
@@ -19,6 +19,7 @@ import {apiPlugin, storyblokInit} from '@storyblok/react';
 import {Layout} from '~/components';
 import {bloks} from '~/bloks';
 import {useStoryblokState} from '@storyblok/react';
+import {loader} from '~/routes';
 
 const shouldUseBridge =
   typeof window !== 'undefined'
@@ -56,6 +57,11 @@ export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   viewport: 'width=device-width,initial-scale=1',
 });
+
+export const useRootLoaderData = () => {
+  const [root] = useMatches();
+  return root?.data as SerializeFrom<typeof loader>;
+};
 
 // export async function loader({context}: LoaderArgs) {
   // const layout = await context.storefront.query<{shop: Shop}>(LAYOUT_QUERY);
