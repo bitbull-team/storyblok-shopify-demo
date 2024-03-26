@@ -7,9 +7,13 @@ export const handleLoader = async ({context, params, request}: LoaderArgs) => {
 
   const cms = await context.storyblok.get(`cdn/stories/${slug}`, {
     version: 'draft',
+    resolve_relations: ['Page.header'],
   });
 
+
+
   const story = cms?.data?.story || null;
+  console.log(story.content.header);
   const {collections, collection, appliedFilters} = await handleCollection(
     context,
     request,

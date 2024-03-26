@@ -2,6 +2,7 @@
 module.exports = {
   appDirectory: 'app',
   ignoredRouteFiles: ['**/.*'],
+  tailwind: true,
   watchPaths: ['./public'],
   server: './server.ts',
   /**
