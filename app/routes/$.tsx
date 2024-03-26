@@ -1,9 +1,9 @@
 import {useLoaderData} from '@remix-run/react';
 import {StoryblokComponent, useStoryblokState} from '@storyblok/react';
-import loaderHandler from '~/utils/loaderHandle';
+import handleLoader from '~/utils/handleLoader';
 
 export async function loader(props) {
-  return loaderHandler(props);
+  return handleLoader(props);
 }
 
 export default function PageTemplate() {

@@ -5,17 +5,15 @@ import {SortFilter} from '~/components/SortFIlter';
 import {loader} from '~/routes/$';
 
 export function Collection({blok, ...props}: PageStoryblok) {
-  const {collections, collection} = useLoaderData<typeof loader>();
+  const {collection} = useLoaderData<typeof loader>();
+
   return (
     <div style={{width: 'calc(100% - 40px)', margin: '0 auto'}}>
       <h2>{collection.title}</h2>
       <h3>{collection.description}</h3>
       <div style={{display: 'flex'}}>
         <div style={{width: '200px'}}>
-          <SortFilter
-            filters={collection.products.filters}
-            collections={collections}
-          />
+          <SortFilter filters={collection.products.filters} />
         </div>
         <div
           style={{
