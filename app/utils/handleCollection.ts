@@ -16,7 +16,7 @@ export const handleCollection = async (context, request, story) => {
   if (!shouldFetchProducts(story)) {
     return {collections: null, collection: null};
   }
-
+  const locale = context.storefront.i18n;
   const searchParams = new URL(request.url).searchParams;
 
   const {sortKey, reverse} = getSortValuesFromParam(
@@ -88,7 +88,10 @@ export const handleCollection = async (context, request, story) => {
       if (foundValue.id === 'filter.v.price') {
         // Special case for price, we want to show the min and max values as the label.
         const input = JSON.parse(foundValue.input as string) as ProductFilter;
-        const min = parseAsCurrency(input.price?.min ?? 0, locale);
+        const min = parseAsCurrency(
+          input.price?.min ?? 0,
+          locale,
+        );
         const max = input.price?.max
           ? parseAsCurrency(input.price.max, locale)
           : '';
