@@ -5,7 +5,7 @@ import {SortFilter} from '~/components/SortFIlter';
 import {loader} from '~/routes/$';
 
 export function Collection({blok, ...props}: PageStoryblok) {
-  const {collection} = useLoaderData<typeof loader>();
+  const {collection, appliedFilters} = useLoaderData<typeof loader>();
 
   return (
     <div style={{width: 'calc(100% - 40px)', margin: '0 auto'}}>
@@ -13,7 +13,10 @@ export function Collection({blok, ...props}: PageStoryblok) {
       <h3>{collection.description}</h3>
       <div style={{display: 'flex'}}>
         <div style={{width: '200px'}}>
-          <SortFilter filters={collection.products.filters} />
+          <SortFilter
+            filters={collection.products.filters}
+            appliedFilters={appliedFilters}
+          />
         </div>
         <div
           style={{

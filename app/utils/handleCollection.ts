@@ -13,7 +13,7 @@ export const handleCollection = async (context, request, story) => {
     });
 
   if (!shouldFetchProducts(story)) {
-    return;
+    return {collections: null, collection: null};
   }
 
   const searchParams = new URL(request.url).searchParams;
@@ -58,56 +58,58 @@ export const handleCollection = async (context, request, story) => {
     throw new Response('collection', {status: 404});
   }
 
-  // const seo = seoPayload.collection({collection, url: request.url});
+  const allFilterValues = collection.products.filters.flatMap(
+    (filter) => filter.values,
+  );
 
-  // const allFilterValues = collection.products.filters.flatMap(
-  //   (filter) => filter.values,
-  // );
+  const appliedFilters = filters
+    .map((filter) => {
+      const foundValue = allFilterValues.find((value) => {
+        const valueInput = JSON.parse(value.input as string) as ProductFilter;
+        // special case for price, the user can enter something freeform (still a number, though)
+        // that may not make sense for the locale/currency.
+        // Basically just check if the price filter is applied at all.
+        if (valueInput.price && filter.price) {
+          return true;
+        }
+        return (
+          // This comparison should be okay as long as we're not manipulating the input we
+          // get from the API before using it as a URL param.
+          JSON.stringify(valueInput) === JSON.stringify(filter)
+        );
+      });
+      if (!foundValue) {
+        // eslint-disable-next-line no-console
+        console.error('Could not find filter value for filter', filter);
+        return null;
+      }
 
-  // const appliedFilters = filters
-  //   .map((filter) => {
-  //     const foundValue = allFilterValues.find((value) => {
-  //       const valueInput = JSON.parse(value.input as string) as ProductFilter;
-  //       // special case for price, the user can enter something freeform (still a number, though)
-  //       // that may not make sense for the locale/currency.
-  //       // Basically just check if the price filter is applied at all.
-  //       if (valueInput.price && filter.price) {
-  //         return true;
-  //       }
-  //       return (
-  //         // This comparison should be okay as long as we're not manipulating the input we
-  //         // get from the API before using it as a URL param.
-  //         JSON.stringify(valueInput) === JSON.stringify(filter)
-  //       );
-  //     });
-  //     if (!foundValue) {
-  //       // eslint-disable-next-line no-console
-  //       console.error('Could not find filter value for filter', filter);
-  //       return null;
-  //     }
+      if (foundValue.id === 'filter.v.price') {
+        // Special case for price, we want to show the min and max values as the label.
+        const input = JSON.parse(foundValue.input as string) as ProductFilter;
+        const min = parseAsCurrency(input.price?.min ?? 0, locale);
+        const max = input.price?.max
+          ? parseAsCurrency(input.price.max, locale)
+          : '';
+        const label = min && max ? `${min} - ${max}` : 'Price';
 
-  //     if (foundValue.id === 'filter.v.price') {
-  //       // Special case for price, we want to show the min and max values as the label.
-  //       const input = JSON.parse(foundValue.input as string) as ProductFilter;
-  //       const min = parseAsCurrency(input.price?.min ?? 0, locale);
-  //       const max = input.price?.max
-  //         ? parseAsCurrency(input.price.max, locale)
-  //         : '';
-  //       const label = min && max ? `${min} - ${max}` : 'Price';
+        return {
+          filter,
+          label,
+        };
+      }
+      return {
+        filter,
+        label: foundValue.label,
+      };
+    })
+    .filter((filter): filter is NonNullable<typeof filter> => filter !== null);
 
-  //       return {
-  //         filter,
-  //         label,
-  //       };
-  //     }
-  //     return {
-  //       filter,
-  //       label: foundValue.label,
-  //     };
-  //   })
-  //   .filter((filter): filter is NonNullable<typeof filter> => filter !== null);
-
-  return {collection, collections: flattenConnection(collections)};
+  return {
+    collection,
+    collections: flattenConnection(collections),
+    appliedFilters,
+  };
 };
 
 export default handleCollection;

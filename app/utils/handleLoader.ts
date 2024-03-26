@@ -10,7 +10,7 @@ export const handleLoader = async ({context, params, request}: LoaderArgs) => {
   });
 
   const story = cms?.data?.story || null;
-  const {collections, collection} = await handleCollection(
+  const {collections, collection, appliedFilters} = await handleCollection(
     context,
     request,
     story,
@@ -20,6 +20,7 @@ export const handleLoader = async ({context, params, request}: LoaderArgs) => {
     story,
     collections,
     collection,
+    appliedFilters,
     slug: params.slug,
   });
 };
