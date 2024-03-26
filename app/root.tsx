@@ -1,8 +1,7 @@
 import {
-  json,
   type LinksFunction,
-  type LoaderArgs,
-  type MetaFunction, SerializeFrom,
+  type MetaFunction,
+  SerializeFrom,
 } from '@shopify/remix-oxygen';
 import {
   Links,
@@ -10,15 +9,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData, useMatches,
+  useMatches,
 } from '@remix-run/react';
-import type {Shop} from '@shopify/hydrogen/storefront-api-types';
-import styles from './styles/app.css';
+import appStyles from './styles/app.css';
+import tailwindStyles from './styles/tailwind.css';
 import favicon from '../public/favicon.svg';
 import {apiPlugin, storyblokInit} from '@storyblok/react';
-import {Layout} from '~/components';
 import {bloks} from '~/bloks';
-import {useStoryblokState} from '@storyblok/react';
 import {loader} from '~/routes';
 
 const shouldUseBridge =
@@ -40,7 +37,8 @@ storyblokInit({
 
 export const links: LinksFunction = () => {
   return [
-    {rel: 'stylesheet', href: styles},
+    {rel: 'stylesheet', href: tailwindStyles},
+    {rel: 'stylesheet', href: appStyles},
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -64,13 +62,13 @@ export const useRootLoaderData = () => {
 };
 
 // export async function loader({context}: LoaderArgs) {
-  // const layout = await context.storefront.query<{shop: Shop}>(LAYOUT_QUERY);
-  // const cms = await context.storyblok.get(`cdn/stories`, {
-  //   version: 'draft',
-  // });
+// const layout = await context.storefront.query<{shop: Shop}>(LAYOUT_QUERY);
+// const cms = await context.storyblok.get(`cdn/stories`, {
+//   version: 'draft',
+// });
 
-  // const stories = cms?.data?.stories || null;
-  // return json({stories, layout});
+// const stories = cms?.data?.stories || null;
+// return json({stories, layout});
 // }
 
 export default function App() {

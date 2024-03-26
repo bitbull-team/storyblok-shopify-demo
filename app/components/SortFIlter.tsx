@@ -39,7 +39,7 @@ export function SortFilter({filters, appliedFilters = [], children}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className="flex items-center justify-between w-full">
+      <div className="bg-red flex items-center justify-between w-full">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={
