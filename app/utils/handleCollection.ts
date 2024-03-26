@@ -1,6 +1,7 @@
 import {flattenConnection} from '@shopify/hydrogen';
 import {ProductFilter} from '@shopify/hydrogen/storefront-api-types';
 import {FILTER_URL_PREFIX, SortParam} from '~/components/SortFIlter';
+import {parseAsCurrency} from '~/lib/utils';
 import {getSortValuesFromParam} from '~/utils/getSortValuesFromParam';
 import {COLLECTION_QUERY} from '~/utils/queries';
 
